@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Link Statistics</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='styles.css') }}"
+    >
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Link Statistics</h1>
+
+    <div class="result">
+
+        <p><strong>Original URL</strong></p>
+
+        <a
+            href="{{ link.long_url }}"
+            target="_blank"
+        >
+            {{ link.long_url }}
+        </a>
+
+        <br><br>
+
+        <p><strong>Short URL</strong></p>
+
+        <a
+            href="{{ short_url }}"
+            target="_blank"
+        >
+            {{ short_url }}
+        </a>
+
+        <br><br>
+
+        <p><strong>Clicks</strong></p>
+
+        <p>{{ link.clicks }}</p>
+
+        <br>
+
+        <p><strong>Created</strong></p>
+
+        <p>{{ link.created_at }}</p>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

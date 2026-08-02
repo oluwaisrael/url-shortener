@@ -146,3 +146,25 @@ body {
     margin-bottom:30px;
 
 }
+
+.links-table{
+    width:100%;
+    margin-top:40px;
+    border-collapse:collapse;
+}
+
+.links-table th,
+.links-table td{
+    padding:14px;
+    border-bottom:1px solid #ddd;
+    text-align:left;
+}
+
+.links-table th{
+    background:#2563eb;
+    color:white;
+}
+
+.links-table tr:hover{
+    background:#f8fafc;
+}

@@ -1,28 +1,59 @@
-# URL Shortener
+# Flask URL Shortener
 
-A simple URL shortener built with Flask.
+A modern URL shortener built with Flask and SQLite.
 
-## USE
+## Features
 
-- Generate unique short URLs
-- Redirect to original URLs
-- Persist URLs using JSON storage
+- Generate random short URLs
+- Custom aliases
+- Click analytics
+- URL validation
+- SQLite persistence
+- Dashboard
+- Copy to clipboard
+- Statistics page
 
 ## Tech Stack
 
 - Python
 - Flask
+- SQLAlchemy
+- SQLite
 - HTML
+- CSS
+- JavaScript
 
 ## Installation
 
 ```bash
-git clone <repo-url>
-cd URL_SHORTENER
 pip install -r requirements.txt
-python main.py
-```
+python3 main.py# Flask URL Shortener
 
-Visit:
+A modern URL shortener built with Flask and SQLite.
 
-http://127.0.0.1:5000
+## Features
+
+- Generate random short URLs
+- Custom aliases
+- Click analytics
+- URL validation
+- SQLite persistence
+- Dashboard
+- Copy to clipboard
+- Statistics page
+
+## Tech Stack
+
+- Python
+- Flask
+- SQLAlchemy
+- SQLite
+- HTML
+- CSS
+- JavaScript
+
+## Installation
+
+```bash
+pip install -r requirements.txt
+python3 main.py

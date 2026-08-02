@@ -99,6 +99,56 @@
 
 </div>
 
+{% if links %}
+
+<h2>Your Links</h2>
+
+<table class="links-table">
+
+    <thead>
+        <tr>
+            <th>Alias</th>
+            <th>Original URL</th>
+            <th>Clicks</th>
+            <th>Created</th>
+            <th>Stats</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+    {% for link in links %}
+
+        <tr>
+
+            <td>{{ link.short_url }}</td>
+
+            <td>
+                <a href="{{ link.long_url }}" target="_blank">
+                    {{ link.long_url[:40] }}...
+                </a>
+            </td>
+
+            <td>{{ link.clicks }}</td>
+
+            <td>{{ link.created_at.strftime("%d %b %Y") }}</td>
+
+            <td>
+                <a href="/stats/{{ link.short_url }}">
+                    View
+                </a>
+            </td>
+
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% endif %}
+
 <script>
 
 function copyURL(button){

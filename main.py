@@ -1,49 +1,64 @@
 import random
 import string
-import json
 import validators
 
 from flask import Flask, render_template, redirect, request
+from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 app = Flask(__name__)
-shortened_urls = {}
 
+# Database configuration
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///links.db"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+db = SQLAlchemy(app)
+
+class Link(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    short_url = db.Column(db.String(20), unique=True, nullable=False)
+
+    long_url = db.Column(db.Text, nullable=False)
+
+    clicks = db.Column(db.Integer, default=0)
+
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
+
+# Generate random short code
 def generate_short_url(length=6):
     chars = string.ascii_letters + string.digits
-    short_urls = "".join(random.choice(chars) for _ in range(length))
-    return short_urls
+    return "".join(random.choice(chars) for _ in range(length))
 
-def save_urls():
-    with open("urls.json", "w") as f:
-        json.dump(shortened_urls, f)
-
-def load_urls():
-    try:
-        with open("urls.json", "r") as f:
-            return json.load(f)
-    except FileNotFoundError:
-        return {}        
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-        
+
     if request.method == "POST":
-        long_url = request.form['long_url']
-        custom_alias = request.form["custom_alias"].strip()
 
+        long_url = request.form["long_url"]
+        custom_alias = request.form.get("custom_alias", "").strip()
+
+        # Validate URL
         if not validators.url(long_url):
-        
-                return render_template(
-                    "index.html",
-                    error="Please enter a valid URL.",
-                    long_url=long_url,
-                    custom_alias=custom_alias
-                )
-        
+            return render_template(
+                "index.html",
+                error="Please enter a valid URL.",
+                long_url=long_url,
+                custom_alias=custom_alias
+            )
 
+        # Custom alias
         if custom_alias:
 
-            if custom_alias in shortened_urls:
+            existing = Link.query.filter_by(
+                short_url=custom_alias
+            ).first()
+
+            if existing:
                 return render_template(
                     "index.html",
                     error="Alias already exists.",
@@ -57,43 +72,72 @@ def index():
 
             short_url = generate_short_url()
 
-            while short_url in shortened_urls:
+            while Link.query.filter_by(
+                short_url=short_url
+            ).first():
                 short_url = generate_short_url()
 
-        shortened_urls[short_url] = {
-            "url": long_url,
-            "clicks": 0
-        }
+        # Save to database
+        link = Link(
+            short_url=short_url,
+            long_url=long_url
+        )
 
-        save_urls()
-        
+        db.session.add(link)
+        db.session.commit()
+
         return render_template(
             "index.html",
             short_url=request.url_root + short_url,
-            clicks=shortened_urls[short_url]["clicks"]
-        )   
-    return render_template("index.html")
+            clicks=link.clicks
+        )
+    links = Link.query.order_by(Link.created_at.desc()).all()
+
+    return render_template(
+        "index.html",
+        short_url=request.url_root + short_url,
+        clicks=link.clicks,
+        links=links
+    )
 
 
 @app.route("/<short_url>")
 def redirect_url(short_url):
 
-    link = shortened_urls.get(short_url)
+    link = Link.query.filter_by(
+        short_url=short_url
+    ).first()
 
     if link:
 
-        link["clicks"] += 1
+        link.clicks += 1
+        db.session.commit()
 
-        save_urls()
-
-        return redirect(link["url"])
+        return redirect(link.long_url)
 
     return "URL not found", 404
+
+@app.route("/stats/<short_url>")
+def stats(short_url):
+
+    link = Link.query.filter_by(
+        short_url=short_url
+    ).first()
+
+    if not link:
+        return "URL not found", 404
+
+    return render_template(
+        "stats.html",
+        link=link,
+        short_url=request.url_root + short_url
+    )
 
 
 if __name__ == "__main__":
 
-    shortened_urls = load_urls()
+    with app.app_context():
+        db.create_all()
 
     app.run(
         host="127.0.0.1",
