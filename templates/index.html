@@ -1,25 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>URL Shortener</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='styles.css') }}"
+    >
+
 </head>
+
 <body>
 
-    <h1>URL Shortener</h1>
+<div class="container">
+
+    <h1>Derin's URL Shortener</h1>
+
+    <p class="subtitle">
+
+    Turn long URLs into short, shareable links.
+
+    </p>
+
+    
+    {% if error %}
+    <p class="error">{{ error }}</p>
+    {% endif %}
+
+    {% if clicks is not none %}
+    <p>Clicks: {{ clicks }}</p>
+    {% endif %}
 
     <form method="POST">
+
         <input
             type="url"
             name="long_url"
-            placeholder="Enter a URL"
+            value="{{ long_url or ''}}"
+            placeholder="Paste your URL here..."
             required
         >
+
+        <input
+            type="text"
+            name="custom_alias"
+            value="{{ custom_alias or ''}}"
+            placeholder="Custom alias (optional)"
+        >
+
         <button type="submit">
-            Shorten
+
+            Shorten URL
+
         </button>
+
     </form>
 
+    {% if short_url %}
+
+    <div class="result">
+
+        <p>Your shortened URL</p>
+        <p>Clicks: {{ clicks }}</p>
+
+        <div class="copy-box">
+
+            <div class="url-display">
+
+                <a
+                    id="shortUrl"
+                    href="{{ short_url }}"
+                    target="_blank"
+                >
+                    {{ short_url }}
+                </a>
+
+            </div>
+
+            <button
+                onclick="copyURL(this)"
+                type="button"
+            >
+                Copy
+            </button>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+<script>
+
+function copyURL(button){
+
+    const url = document
+        .getElementById("shortUrl")
+        .textContent;
+
+    navigator.clipboard.writeText(url);
+
+    button.textContent = "Copied!";
+
+    setTimeout(() => {
+
+        button.textContent = "Copy";
+
+    }, 2000);
+
+}
+
+</script>
+
 </body>
+
 </html>
